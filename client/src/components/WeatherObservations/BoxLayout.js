@@ -6,7 +6,7 @@ import SettingsComponent from './SettingsComponent';
 
 function generateLayout(info) {
 
-  const title = `Average temperatures in ${info.place}, Finland from ` +
+  const title = `Average temperatures in ${info.place} from ` +
     info.startDate + ' to ' + info.endDate;
 
   return {
