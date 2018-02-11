@@ -45,14 +45,15 @@ export class BoxLayout extends React.Component {
 
   refreshData = async (startDate, endDate, place) => {
 
-    this.toastId = toast('Fetching data...', { autoClose: false });
+    this.toastId = toast(`Fetching data for ${place}...`, { autoClose: false });
 
     const query = `?startDate=${startDate}&endDate=${endDate}&place=${place}`;
     const response = await fetch(`/api/observations${query}`);
 
     if (response.status !== 200) {
       toast.dismiss(this.toastId);
-      this.toastId = toast.error('Error with fetching content!');
+      const msg = await response.text();
+      this.toastId = toast.error('Error with fetching content: ' + msg);
       this.setDefaults();
     } else {
       toast.dismiss(this.toastId);

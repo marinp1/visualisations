@@ -22,6 +22,9 @@ module.exports.parseWeatherObservations = function(data) {
     const monthName = moment(param_time).format('MMMM')
 
     function addTopMap(arr, key, value) {
+      if (value === 'NaN') {
+        throw new Error('No data found!');
+      }
       arr.push({month: key, val: Number(value)})
     }
 
@@ -48,7 +51,7 @@ module.exports.parseWeatherObservations = function(data) {
   }
 
   if (averages.length === 0) {
-    throw new Error('No data found');
+    throw new Error('No data found!');
   }
 
   const averageData = mapToData(averages, 'avg', '#2CDA9D');

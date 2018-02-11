@@ -89,6 +89,10 @@ class SettingsComponent extends React.Component {
     const isBeforeEnd = start.isBefore(end);
     const isBeforeNow = end.isBefore(now);
 
+    const MAX_HOURS = 8928; // The max difference allowed in the FMI API
+    const difference = moment.duration(end.diff(start)).asHours();
+    const isWithinLimits = difference <= MAX_HOURS;
+
     const isNotEmpty = placename.trim().length > 0;
 
     const msgs = [];
@@ -97,12 +101,16 @@ class SettingsComponent extends React.Component {
       msgs.push('Start date must be before end date and both have to be in the past.');
     }
 
+    if (!isWithinLimits) {
+      msgs.push(`Difference cannot exceed 372 days.`)
+    }
+
     if (!isNotEmpty) {
       msgs.push('Place name cannot be empty.');
     }
 
     this.setState({
-      formValid: isBeforeEnd && isBeforeNow && isNotEmpty,
+      formValid: isBeforeEnd && isBeforeNow && isNotEmpty && isWithinLimits,
       formErrorMessage: msgs.join('\n'),
     });
   }

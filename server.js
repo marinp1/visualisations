@@ -15,7 +15,6 @@ const port = process.env.PORT || 5000;
 const parser = require("./parser.js");
 
 async function getFMIObservations(startTime, endTime, location) {
-  // Move api key to environment variable
   const SERVER_URL = `http://data.fmi.fi/fmi-apikey/${FMI_API_KEY}/wfs`;
   const STORED_QUERY_OBSERVATION = "fmi::observations::weather::daily::simple";
   const URL_PART_1 = `${SERVER_URL}?request=getFeature&storedquery_id=${STORED_QUERY_OBSERVATION}`;
@@ -26,7 +25,7 @@ async function getFMIObservations(startTime, endTime, location) {
     const text = await response.text();
     return parser.parseWeatherObservations(text);
   }
-  throw new Error(response.statusText)
+  throw new Error('No data found!');
 }
 
 // Check cache
@@ -46,7 +45,7 @@ app.get('/api/observations', (req, res) => {
     })
     .catch(e => {
       // Perhaps send some information with the error?
-      res.sendStatus(404);
+      res.status(404).send(e.message);
     })
 
 });
