@@ -4,7 +4,9 @@
   "scripts": {
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
-    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+    "start": "node server.js",
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
+    "heroku-postbuild": "cd client && yarn --production=false && yarn run build"
   },
   "dependencies": {
     "dotenv": "^5.0.0",
@@ -12,9 +14,7 @@
     "isomorphic-fetch": "^2.2.1",
     "moment": "^2.20.1",
     "xmldom": "^0.1.27",
-    "xpath": "^0.0.27"
-  },
-  "devDependencies": {
+    "xpath": "^0.0.27",
     "concurrently": "^3.5.0"
   }
 }

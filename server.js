@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require('isomorphic-fetch');
 const moment = require('moment');
+const path = require('path');
 
 require('dotenv').config();
 
@@ -27,6 +28,9 @@ async function getFMIObservations(startTime, endTime, location) {
   }
   throw new Error('No data found!');
 }
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, './client/build')));
 
 // Check cache
 app.get('/api/observations', (req, res) => {
