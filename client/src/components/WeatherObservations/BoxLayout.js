@@ -1,5 +1,12 @@
 import React from 'react';
 import { toast } from 'react-toastify';
+import glamorous from 'glamorous';
+
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
+import faTimes from '@fortawesome/fontawesome-free-solid/faTimes';
+import faWarning from '@fortawesome/fontawesome-free-solid/faExclamationTriangle';
+import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner';
 
 import { Plot } from '../App';
 import SettingsComponent from './SettingsComponent';
@@ -18,6 +25,17 @@ function generateLayout(info) {
     },
   }
 }
+
+const TextContent = glamorous.span({
+  marginLeft: '1rem',
+});
+
+const NotificationDiv = ({ iconName, text, spinning }) => (
+  <div>
+    <FontAwesomeIcon icon={ iconName } spin={ spinning }/>
+    <TextContent>{text}</TextContent>
+  </div>
+);
 
 export class BoxLayout extends React.Component {
 
@@ -45,21 +63,59 @@ export class BoxLayout extends React.Component {
 
   refreshData = async (startDate, endDate, place) => {
 
-    this.toastId = toast(`Fetching data for ${place}...`, { autoClose: false });
+    this.toastId = toast(
+      <NotificationDiv
+        iconName={faSpinner}
+        text={`Fetching data for ${place}...`}
+        spinning={true}
+      />, { autoClose: false });
 
     const query = `?startDate=${startDate}&endDate=${endDate}&place=${place}`;
     const response = await fetch(`/api/observations${query}`);
 
     if (response.status !== 200) {
-      toast.dismiss(this.toastId);
       const msg = await response.text();
-      this.toastId = toast.error('Error with fetching content: ' + msg);
+
+      toast.update(this.toastId, {
+        render:
+          <NotificationDiv
+            iconName={faTimes}
+            text={`Error with fetching content: ${msg}`}
+            spinning={false}
+          />,
+         type: toast.TYPE.ERROR,
+         autoClose: 3000
+       });
+
       this.setDefaults();
     } else {
-      toast.dismiss(this.toastId);
-      this.toastId = toast.success('Graph generated successfully!');
-
       const res = await response.text();
+      const missingDataPoints = JSON.parse(res).missingDataPoints;
+
+      if (missingDataPoints > 0) {
+        toast.update(this.toastId, {
+          render:
+            <NotificationDiv
+              iconName={faWarning}
+              text={`Graph generated with ${missingDataPoints} missing data points!`}
+              spinning={false}
+            />,
+          type: toast.TYPE.WARNING,
+          autoClose: 3000
+        });
+      } else {
+        toast.update(this.toastId, {
+           render:
+             <NotificationDiv
+              iconName={faCheck}
+              text='Graph generated successfully!'
+              spinning={false}
+             />,
+           type: toast.TYPE.SUCCESS,
+           autoClose: 3000
+         });
+      }
+
       this.setState({
         data: JSON.parse(res).data,
         layoutSettings: {

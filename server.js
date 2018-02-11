@@ -44,8 +44,11 @@ app.get('/api/observations', (req, res) => {
   const endTime = moment(rawEndDate).endOf('day').toISOString();
 
   getFMIObservations(startTime, endTime, rawPlace)
-    .then(data => {
-      res.status(200).send({ data })
+    .then(parsedData => {
+      res.status(200).send({
+        data: parsedData.graphData,
+        missingDataPoints: parsedData.missingDataPoints,
+      })
     })
     .catch(e => {
       // Perhaps send some information with the error?
